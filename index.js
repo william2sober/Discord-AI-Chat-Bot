@@ -19,13 +19,18 @@ let chatData = {};
 if (fs.existsSync(dataFile)) {
   chatData = JSON.parse(fs.readFileSync(dataFile));
 } else {
-  chatData = { count: 0, lastReset: moment().tz('America/Chicago').format('MMMM Do YYYY, h:mm:ss A') };
+  chatData = {
+    count: 0,
+    lastReset: moment().tz('America/Chicago').format('MMMM Do YYYY, h:mm:ss A')
+  };
 }
 
 function resetChatCount() {
   const chicagoTime = moment().tz('America/Chicago');
   const currentDate = chicagoTime.format('YYYY-MM-DD');
-  const lastResetDate = moment(chatData.lastReset, 'MMMM Do YYYY, h:mm:ss A').tz('America/Chicago').format('YYYY-MM-DD');
+  const lastResetDate = moment(chatData.lastReset, 'MMMM Do YYYY, h:mm:ss A')
+    .tz('America/Chicago')
+    .format('YYYY-MM-DD');
 
   if (currentDate !== lastResetDate) {
     chatData.count = 0;
@@ -51,6 +56,13 @@ client.on('messageCreate', async (message) => {
   updateStatus();
 
   try {
+    // Simulate typing
+    await message.channel.sendTyping();
+
+    // Add a delay (2 to 4 seconds)
+    const delay = Math.floor(Math.random() * 2000) + 2000;
+    await new Promise(resolve => setTimeout(resolve, delay));
+
     const response = await axios.post(
       'https://api.groq.com/openai/v1/chat/completions',
       {
